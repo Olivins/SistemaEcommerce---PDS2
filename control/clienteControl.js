@@ -37,18 +37,44 @@ app.controller('clienteControl', function ($scope,$http) {
             'fax': '232323'
         },
     ]*/
-    
+
     $scope.novo = function () {
         $scope.cliente = {};
     }
 
-    $scope.salvar = function () {
-        $scope.clientes.push($scope.cliente);
-        $scope.novo();
+    $scope.salvar = function() {
+        if (typeof $scope.cliente.codigo == 'undefined') {            
+            $http.post(url,$scope.cliente).then(function (response) {
+                $scope.clientes.push(response.data);
+                $scope.novo();
+            }, function (error) {
+                alert(error);
+                console.log(error);
+            });
+        } else {
+            $http.put(url,$scope.cliente).then(function () {
+                $scope.pesquisar();
+                $scope.novo();
+            }, function (error) {
+                alert(error);
+                console.log(error);
+            });
+        } 
     }
-    $scope.excluir = function(){
-        $scope.clientes.splice($scope.clientes.indexOf($scope.cliente))
-    }
+    $scope.excluir = function() {
+        if (typeof $scope.cliente.codigo == 'undefined') {
+            alert('Escolha um cliente');
+        } else {
+            urlExcluir = url+"/"+$scope.cliente.codigo;
+            $http.delete(urlExcluir).then(function () {
+                $scope.pesquisar();
+                $scope.novo();
+            }, function (error) {
+                alert(error);
+                console.log(error);
+            }); 
+        }
+    
 
     $scope.seleciona = function(){
         $scope.cliente = cliente;
